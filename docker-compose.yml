@@ -1,17 +1,21 @@
 version: '2'
-
-# Run: docker-compose up -d
-# You can also start only the services needed. For example `docker-compuse up -d gitlab jenkins`. 
-# Modify the mapped volumes as needed
-
-#Access:
-# Gitlab:       http://127.0.0.1:18080
-  # Login to gitlab using username: "root" and password: "5iveL!fe".
-  # Add your own user, setup ssh keys and so on.
-# Artifactory:  http://127.0.0.1:18081
-# Jenkins:      http://127.0.0.1:18082
-# SonarQube:    http://127.0.0.1:19000
-
+###################################################################################################
+#  Run: docker-compose up -d                                                                      #
+#  You can also start only the services needed. For example `docker-compuse up -d gitlab jenkins`.#
+#  Modify the mapped volumes as needed                                                            #
+#                                                                                                 #
+#   Access to the CICD Tools:                                                                                       #
+#                                                                                                 #
+#     Gitlab:       http://127.0.0.1:18080                                                        #
+#                   Login to gitlab using username: "root" and password: "5iveL!fe".              #
+#                   Add your own user, setup ssh keys and so on.                                  #
+#     Artifactory:  http://127.0.0.1:18081                                                        #
+#                                                                                                 #   
+#     Jenkins:      http://127.0.0.1:18082                                                        #
+#                                                                                                 #
+#     SonarQube:    http://127.0.0.1:19000                                                        #
+#                                                                                                 #
+###################################################################################################
 
 networks:
   prodnetwork:
@@ -21,7 +25,8 @@ services:
   gitlab:
     image: 'gitlab/gitlab-ce:latest'
     restart: always
-    hostname: 'gitlab.ngena.docker'
+    hostname: 'gitlab.docker'
+    domain: 'ngena.com'
     environment:
         GITLAB_OMNIBUS_CONFIG:
         # external_url 'https://gitlab.ngena.com'
@@ -40,9 +45,9 @@ services:
   jenkins:
     build: 'jenkins'
     restart: always
-    hostname: 'jenkins.ngena.docker'
+    hostname: 'jenkins.docker'
+    domain: 'ngena.com'
     environment:
-    # VIRTUAL_PORT: 8080
       ARTIFACTORY_PORT: 8081
       SONAR_PORT: 9000
       SONAR_DB_PORT: 5432
@@ -60,9 +65,9 @@ services:
   artifactory:
     image: 'docker.bintray.io/jfrog/artifactory-oss:latest'
     restart: always
-    hostname: 'artifactory.ngena.docker'
+    hostname: 'artifactory.docker'
+    domain: 'ngena.com'
     environment:
-    #  HOSTNAME: 'artifactory.ngena.docker'
       VIRTUAL_PORT: 8081
     ports:
       - '18081:8081'
@@ -76,9 +81,9 @@ services:
   sonardb:
     image: postgres:latest
     restart: always
-    hostname: 'sonardb.ngena.docker'
+    hostname: 'sonardb.docker'
+    domain: 'ngena.com'
     environment:
-    #  HOSTNAME: 'sonardb.ngena.docker'
       POSTGRES_USER: 'sonar'
       POSTGRES_PASSWORD: 'secret'
     networks:
@@ -89,24 +94,21 @@ services:
   sonar:
     image: sonarqube:latest
     restart: always
-    hostname: 'sonar.ngena.docker'
+    hostname: 'sonar.docker'
+    domain: 'ngena.com'
     depends_on:
       - sonardb
     environment:
-    #  HOSTNAME: 'sonar.ngena.docker'
-    #  VIRTUAL_PORT: 9000
       SONARQUBE_JDBC_USERNAME: 'sonar'
       SONARQUBE_JDBC_PASSWORD: 'secret'
       SONARQUBE_JDBC_URL: 'jdbc:postgresql://sonardb:5432/sonar'
-    #links:
-    #  - sonardb:sonardb.docker
-    #  - gitlab:gitlab.ngena.docker
     networks:
     - prodnetwork
     ports:
       - "19000:9000"
       - "5432:5432"
 
+#Below configuratoin is provided in case Gitlab-CI runners need to be run
 #gitlabrunner:
 #  image: 'gitlab/gitlab-runner:latest'
 #  restart: always
