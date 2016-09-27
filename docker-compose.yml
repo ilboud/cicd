@@ -1,20 +1,29 @@
 version: '2'
 ###################################################################################################
+#  Dockerized CICD Stack                                                                          #
+#  Author: Abdallah Atie (aatie@cisco.com)                                                        #
+###################################################################################################
+#                                                                                                 #
 #  Run: docker-compose up -d                                                                      #
+#                                                                                                 #
 #  You can also start only the services needed. For example `docker-compuse up -d gitlab jenkins`.#
 #  Modify the mapped volumes as needed                                                            #
 #                                                                                                 #
-#   Access to the CICD Tools:                                                                                       #
+#   Access to the CICD Tools:                                                                     #
 #                                                                                                 #
 #     Gitlab:       http://127.0.0.1:18080                                                        #
 #                   Login to gitlab using username: "root" and password: "5iveL!fe".              #
 #                   Add your own user, setup ssh keys and so on.                                  #
+#                                                                                                 #
 #     Artifactory:  http://127.0.0.1:18081                                                        #
-#                                                                                                 #   
+#                   Artifactory comes with a pre-configured default "admin" account.              #
+#                   Username: "admin", Password: "password"                                       #
+#                                                                                                 #
 #     Jenkins:      http://127.0.0.1:18082                                                        #
 #                                                                                                 #
 #     SonarQube:    http://127.0.0.1:19000                                                        #
-#                                                                                                 #
+#                   SonarQube comes with a pre-configured default "admin" account.                #
+#                   Username: "admin", Password: "admin"                                          #                                                                                                 #
 ###################################################################################################
 
 networks:
@@ -26,7 +35,7 @@ services:
     image: 'gitlab/gitlab-ce:latest'
     restart: always
     hostname: 'gitlab.docker'
-    domain: 'ngena.com'
+    domainname: 'ngena.com'
     environment:
         GITLAB_OMNIBUS_CONFIG:
         # external_url 'https://gitlab.ngena.com'
@@ -46,7 +55,7 @@ services:
     build: 'jenkins'
     restart: always
     hostname: 'jenkins.docker'
-    domain: 'ngena.com'
+    domainname: 'ngena.com'
     environment:
       ARTIFACTORY_PORT: 8081
       SONAR_PORT: 9000
@@ -66,7 +75,7 @@ services:
     image: 'docker.bintray.io/jfrog/artifactory-oss:latest'
     restart: always
     hostname: 'artifactory.docker'
-    domain: 'ngena.com'
+    domainname: 'ngena.com'
     environment:
       VIRTUAL_PORT: 8081
     ports:
@@ -82,7 +91,7 @@ services:
     image: postgres:latest
     restart: always
     hostname: 'sonardb.docker'
-    domain: 'ngena.com'
+    domainname: 'ngena.com'
     environment:
       POSTGRES_USER: 'sonar'
       POSTGRES_PASSWORD: 'secret'
@@ -95,7 +104,7 @@ services:
     image: sonarqube:latest
     restart: always
     hostname: 'sonar.docker'
-    domain: 'ngena.com'
+    domainname: 'ngena.com'
     depends_on:
       - sonardb
     environment:
