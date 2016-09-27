@@ -61,9 +61,9 @@ services:
       SONAR_PORT: 9000
       SONAR_DB_PORT: 5432
     links:
-      - gitlab:gitlab.ngena.docker
-      - sonardb:sonardb.ngena.docker
-      - artifactory:artifactory.ngena.docker
+      - gitlab:gitlab.docker.ngena.com
+      - sonardb:sonardb.docker.ngena.com
+      - artifactory:artifactory.docker.ngena.com
     ports:
       - '18082:8080'
     networks:
@@ -117,21 +117,24 @@ services:
       - "19000:9000"
       - "5432:5432"
 
-#Below configuratoin is provided in case Gitlab-CI runners need to be run
+###################################################################################################
+# Below configuratoin is provided in case Gitlab-CI runners need to be run                        #
+###################################################################################################
+
 #gitlabrunner:
 #  image: 'gitlab/gitlab-runner:latest'
 #  restart: always
 #  privileged: true
 #  environment:
 #    REGISTRATION_TOKEN: 'erGgqG8NGMMsBxDtSpzn'
-#    CI_SERVER_URL: 'http://gitlab.ngena.docker/ci'
+#    CI_SERVER_URL: 'http://gitlab.docker.ngena.com/ci'
 #    RUNNER_NAME: 'docker-runner'
 #    RUNNER_EXECUTOR: 'docker'
 #    RUNNER_LIMIT: '3'
 #    DOCKER_IMAGE: 'gitlab/dind:latest'
 #    DOCKER_PRIVILEGED: 'true'
 #    RUNNER_TAG_LIST: 'dind'
-#    DOCKER_VOLUMES: '/var/lib/boot2docker/gitlab/runner/gradle_cache:/gradle:rw'
+#    DOCKER_VOLUMES: '/Users/aatie/Projects/Docker/CICD/cicd/volumes/gitlab/runner/gradle_cache:/gradle:rw'
 #  volumes:
 #    - /var/run/docker.sock:/var/run/docker.sock
 #    - .data/config:/etc/gitlab-runner
@@ -139,5 +142,5 @@ services:
 ## Register the runner(s) manually :(
 #docker exec -i -t buildenv_gitlabrunner_1 gitlab-runner register -n \
 #   --docker-links 'cicd_sonardb_1:sonardb.docker' \
-#   --docker-links 'cicd_gitlab_1:gitlab.ngena.docker' \
-#   --docker-links 'cicd_artifactory_1:artifactory.ngena.docker'
+#   --docker-links 'cicd_gitlab_1:gitlab.docker' \
+#   --docker-links 'cicd_artifactory_1:artifactory.docker'
