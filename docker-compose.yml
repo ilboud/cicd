@@ -62,7 +62,7 @@ services:
       SONAR_DB_PORT: 5432
     links:
       - gitlab:gitlab.docker.ngena.com
-      - sonardb:sonardb.docker.ngena.com
+      - sonar:sonar.docker.ngena.com
       - artifactory:artifactory.docker.ngena.com
     ports:
       - '18082:8080'
