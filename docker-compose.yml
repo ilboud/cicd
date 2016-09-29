@@ -19,7 +19,9 @@ version: '2'
 #                   Artifactory comes with a pre-configured default "admin" account.              #
 #                   Username: "admin", Password: "password"                                       #
 #                                                                                                 #
-#     Jenkins:      http://127.0.0.1:18082                                                        #
+#     Jenkins:  http://127.0.0.1:18082                                                            #
+#               run the folloeing command to find password:                                       #
+#               docker exec -it cicd_jenkins_1 cat /var/jenkins_home/secrets/initialAdminPassword #
 #                                                                                                 #
 #     SonarQube:    http://127.0.0.1:19000                                                        #
 #                   SonarQube comes with a pre-configured default "admin" account.                #
@@ -36,6 +38,10 @@ services:
     restart: always
     hostname: 'gitlab.docker'
     domainname: 'ngena.com'
+    #dns:
+    #- 0.0.0.0
+    #- 8.8.8.8
+    #dns_search: service.consul
     environment:
         GITLAB_OMNIBUS_CONFIG:
         # external_url 'https://gitlab.ngena.com'
@@ -60,10 +66,10 @@ services:
       ARTIFACTORY_PORT: 8081
       SONAR_PORT: 9000
       SONAR_DB_PORT: 5432
-    links:
-      - gitlab:gitlab.docker.ngena.com
-      - sonar:sonar.docker.ngena.com
-      - artifactory:artifactory.docker.ngena.com
+    #links:
+    #  - gitlab:gitlab.docker.ngena.com
+    #  - sonar:sonar.docker.ngena.com
+    #  - artifactory:artifactory.docker.ngena.com
     ports:
       - '18082:8080'
     networks:
@@ -76,6 +82,10 @@ services:
     restart: always
     hostname: 'artifactory.docker'
     domainname: 'ngena.com'
+    #dns:
+    #- 0.0.0.0
+    #- 8.8.8.8
+    #dns_search: service.consul
     environment:
       VIRTUAL_PORT: 8081
     ports:
@@ -116,6 +126,35 @@ services:
     ports:
       - "19000:9000"
       - "5432:5432"
+
+###################################################################################################
+# Below configuratoin is provided to run jenkins slaves using the Swarm plugin                    #
+# After running the master for the first time, under Manage Jenkins > System configuration        # 
+# configure the JENKINS_URL with 'http://jenkins:8080'                                            #
+#                                                                                                 #
+###################################################################################################
+
+  slave:
+    build: 'slave'
+    restart: always
+    volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /Users/aatie/Projects/Docker/CICD/cicd/volumes/slaves:/var/jenkins_home/slave
+    links:
+    - jenkins:jenkins.docker.ngena.com
+    environment:
+    - JAVA_OPTS=-Xmx2048m
+    - JENKINS_NAME=slave
+    - JENKINS_RETRY=5
+    networks:
+    - prodnetwork
+    depends_on:
+      - jenkins
+    env_file:
+    #- slave.env
+    - .secret
+
+
 
 ###################################################################################################
 # Below configuratoin is provided in case Gitlab-CI runners need to be run                        #
